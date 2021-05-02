@@ -1,3 +1,4 @@
+
 // Local Headers
 #include "glitter.hpp"
 
@@ -24,6 +25,8 @@
 #include "frame.h"
 #include "queue.h"
 #include "interpolator.h"
+
+#define VERTEX_ATTRIB_INDEX 1
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -109,11 +112,12 @@ int main(int argc, char * argv[]) {
 
     // Load GLFW and Create a Window
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
+    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    // glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 #if 0
     auto mWindow = glfwCreateWindow(mWidth, mHeight, "OpenGL", nullptr, nullptr);
 
@@ -143,6 +147,7 @@ int main(int argc, char * argv[]) {
     }   glfwTerminate();
 #endif
 
+
     GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "TLDM", NULL, NULL);
     if (window == NULL)
     {
@@ -151,13 +156,17 @@ int main(int argc, char * argv[]) {
         return -1;
     }
     glfwMakeContextCurrent(window);
+
+    gladLoadGL();
+    fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
+    
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     // tell GLFW to capture our mouse
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+// commented out to help debugging    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -186,10 +195,13 @@ int main(int argc, char * argv[]) {
         unsigned int VAO = dot.meshes[i].VAO;
         glBindVertexArray(VAO);
         // set attribute pointers for vec2
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), nullptr);
+        glEnableVertexAttribArray(VERTEX_ATTRIB_INDEX);
+        glVertexAttribPointer(VERTEX_ATTRIB_INDEX, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), nullptr);
 
-        glVertexAttribDivisor(3, 1);
+#if 0
+	// set the divisor to 1 - which is the default anyway
+        glVertexAttribDivisor(VERTEX_ATTRIB_INDEX, 1);
+#endif
 
         glBindVertexArray(0);
     }
